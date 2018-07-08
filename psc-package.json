@@ -1,0 +1,13 @@
+{
+  "name": "virtual-go-board",
+  "set": "psc-0.12.0-20180704",
+  "source": "https://github.com/purescript/package-sets.git",
+  "depends": [
+    "console",
+    "effect",
+    "foldable-traversable",
+    "halogen",
+    "prelude",
+    "psci-support"
+  ]
+}

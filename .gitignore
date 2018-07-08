@@ -1,0 +1,7 @@
+/.pulp-cache/
+/output/
+/.psc-package/
+/.psc*
+/.purs*
+/.psa*
+/static/js/
