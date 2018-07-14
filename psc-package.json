@@ -6,6 +6,7 @@
     "console",
     "effect",
     "foldable-traversable",
+    "generics-rep",
     "halogen",
     "prelude",
     "psci-support"
