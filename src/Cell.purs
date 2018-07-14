@@ -9,7 +9,7 @@ import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
--- import Halogen.HTML.Properties as HP
+import Halogen.HTML.Properties as HP
 
 data CellState = Empty | Black | White
 
@@ -52,7 +52,8 @@ cell =
       label = show state
     in
       HH.div
-        [ HE.onClick (HE.input_ Toggle) ]
+        [ HP.class_ (H.ClassName "cell")
+        , HE.onClick (HE.input_ Toggle) ]
         [ HH.text label ]
 
   eval :: Query ~> H.ComponentDSL State Query Message m
