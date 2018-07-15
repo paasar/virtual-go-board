@@ -4,6 +4,7 @@ import Prelude
 
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
+import Data.Generic.Rep.Eq (genericEq)
 
 import Data.Maybe (Maybe(..))
 import Halogen as H
@@ -14,9 +15,10 @@ import Halogen.HTML.Properties as HP
 data CellState = Empty | Black | White
 
 derive instance genericCellState :: Generic CellState _
-
 instance showCellState :: Show CellState where
   show = genericShow
+instance eqCellState :: Eq CellState where
+  eq = genericEq
 
 nextState :: CellState -> CellState
 nextState Empty = Black
@@ -49,12 +51,17 @@ cell =
   render :: State -> H.ComponentHTML Query
   render state =
     let
-      label = show state
+      children = if state == Empty
+                   then []
+                   else [ HH.div
+                          [ HP.classes [ (H.ClassName "piece"),
+                                         (H.ClassName $ show state)] ]
+                          [ HH.text ""]]
     in
       HH.div
         [ HP.class_ (H.ClassName "cell")
         , HE.onClick (HE.input_ Toggle) ]
-        [ HH.text label ]
+        children
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval = case _ of

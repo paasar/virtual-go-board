@@ -6,4 +6,20 @@
 
 .cell {
   padding: 3px;
+  height: 40px;
+  background: #888;
+}
+
+.cell:nth-child(2n) {
+  background: #666;
+}
+
+.piece {
+  background: #000;
+  border-radius: 50%;
+  height: 40px;
+}
+
+.piece.White {
+  background: #fff;
 }
