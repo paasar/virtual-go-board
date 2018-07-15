@@ -35,11 +35,11 @@ type Input = Unit
 
 data Message = Toggled CellState
 
-cell :: forall m. H.Component HH.HTML Query Input Message m
-cell =
+cell :: forall m. String -> H.Component HH.HTML Query Input Message m
+cell orientationClass =
   H.component
     { initialState: const initialState
-    , render
+    , render: (render orientationClass)
     , eval
     , receiver: const Nothing
     }
@@ -48,8 +48,8 @@ cell =
   initialState :: State
   initialState = Empty
 
-  render :: State -> H.ComponentHTML Query
-  render state =
+  render :: String -> State -> H.ComponentHTML Query
+  render orientationClassName state =
     let
       children = if state == Empty
                    then []
@@ -59,7 +59,8 @@ cell =
                           [ HH.text ""]]
     in
       HH.div
-        [ HP.class_ (H.ClassName "cell")
+        [ HP.classes [ (H.ClassName "cell"),
+                       (H.ClassName orientationClassName) ]
         , HE.onClick (HE.input_ Toggle) ]
         children
 

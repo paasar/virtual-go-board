@@ -1,7 +1,27 @@
+body {
+  background-color: #ccc;
+}
+
+#title {
+  font-family: sans-serif;
+  font-size: 20px;
+  margin-left: 40px;
+}
+
 .board {
-  margin: 50px;
+  margin: 40px;
   display: grid;
+}
+
+.board.x9 {
   grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+}
+
+.board.x13 {
+  grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
+}
+.board.x19 {
+  grid-template-columns: 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px 50px;
 }
 
 .cell {
@@ -10,8 +30,32 @@
   background: #888;
 }
 
-.cell:nth-child(2n) {
-  background: #666;
+.cell.nw {
+  background-image: url('../image/nw.svg');
+}
+.cell.n {
+  background-image: url('../image/n.svg');
+}
+.cell.ne {
+  background-image: url('../image/ne.svg');
+}
+.cell.w {
+  background-image: url('../image/w.svg');
+}
+.cell.m {
+  background-image: url('../image/m.svg');
+}
+.cell.e {
+  background-image: url('../image/e.svg');
+}
+.cell.sw {
+  background-image: url('../image/sw.svg');
+}
+.cell.s {
+  background-image: url('../image/s.svg');
+}
+.cell.se {
+  background-image: url('../image/se.svg');
 }
 
 .piece {

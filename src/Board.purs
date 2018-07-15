@@ -2,7 +2,7 @@ module Board where
 
 import Prelude
 
-import Data.Array (replicate)
+import Data.Array (concat, replicate)
 import Data.Maybe (Maybe(Nothing))
 
 import Halogen as H
@@ -35,11 +35,32 @@ board =
     render :: State -> H.ParentHTML Query Cell.Query Slot m
     render state =
       HH.div
-        [ HP.class_ (H.ClassName "board") ]
-        (replicate (9 * 9) $ HH.slot CellSlot Cell.cell unit (HE.input Clicked))
+        [ HP.classes [ (H.ClassName "board"),
+                       (H.ClassName $ "x" <> (show size)) ] ]
+        (createCells size)
+        where
+          size = 9 -- TODO dropdown of 9, 13 and 19
 
     eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Void m
     eval = case _ of
       Clicked (Cell.Toggled _) next -> do
         pure next
 
+createCells :: forall m. Int -> Array (H.ParentHTML Query Cell.Query Slot m)
+createCells cellsPerRow = topRow <> middleRows <> bottomRow
+  where
+    topRow = [(createCell "nw")]
+          <> (replicate middleCellsAmount (createCell "n"))
+          <> [(createCell "ne")]
+    middleRows = concat $ replicate middleCellsAmount middleRow
+    middleRow = [(createCell "w")]
+             <> (replicate middleCellsAmount (createCell "m"))
+             <> [(createCell "e")]
+    bottomRow = [(createCell "sw")]
+             <> (replicate middleCellsAmount (createCell "s"))
+             <> [(createCell "se")]
+    middleCellsAmount = (cellsPerRow - 2)
+
+createCell :: forall m. String -> H.ParentHTML Query Cell.Query Slot m
+createCell orientationClass =
+  HH.slot CellSlot (Cell.cell orientationClass) unit (HE.input Clicked)
