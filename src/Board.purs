@@ -35,11 +35,12 @@ board =
     render :: State -> H.ParentHTML Query Cell.Query Slot m
     render state =
       HH.div
-        [ HP.classes [ (H.ClassName "board"),
-                       (H.ClassName $ "x" <> (show size)) ] ]
+        [ HP.classes [ (H.ClassName "board")
+                     , (H.ClassName $ "x" <> (show size)) ] ]
         (createCells size)
         where
-          size = 9 -- TODO dropdown of 9, 13 and 19
+          -- TODO dropdown of 9, 13 and 19
+          size = 9
 
     eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Void m
     eval = case _ of
