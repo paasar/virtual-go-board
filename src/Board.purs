@@ -2,7 +2,7 @@ module Board where
 
 import Prelude
 
-import Data.Array (concat, replicate)
+import Data.Array (concat, length, range, replicate, zipWith)
 import Data.Maybe (Maybe(Nothing))
 
 import Halogen as H
@@ -16,7 +16,7 @@ data Query a
 
 type State = Int
 
-data Slot = CellSlot
+data Slot = CellSlot Int
 derive instance eqCellSlot :: Eq Slot
 derive instance ordCellSlot :: Ord Slot
 
@@ -48,20 +48,22 @@ board =
         pure next
 
 createCells :: forall m. Int -> Array (H.ParentHTML Query Cell.Query Slot m)
-createCells cellsPerRow = topRow <> middleRows <> bottomRow
+createCells cellsPerRow = createSlots $ topRow <> middleRows <> bottomRow
   where
-    topRow = [(createCell "nw")]
-          <> (replicate middleCellsAmount (createCell "n"))
-          <> [(createCell "ne")]
+    topRow = [(Cell.cell "nw")]
+          <> (replicate middleCellsAmount (Cell.cell "n"))
+          <> [(Cell.cell "ne")]
     middleRows = concat $ replicate middleCellsAmount middleRow
-    middleRow = [(createCell "w")]
-             <> (replicate middleCellsAmount (createCell "m"))
-             <> [(createCell "e")]
-    bottomRow = [(createCell "sw")]
-             <> (replicate middleCellsAmount (createCell "s"))
-             <> [(createCell "se")]
+    middleRow = [(Cell.cell "w")]
+             <> (replicate middleCellsAmount (Cell.cell "m"))
+             <> [(Cell.cell "e")]
+    bottomRow = [(Cell.cell "sw")]
+             <> (replicate middleCellsAmount (Cell.cell "s"))
+             <> [(Cell.cell "se")]
     middleCellsAmount = (cellsPerRow - 2)
+    createSlots cells = zipWith createSlot cells (range 1 (length cells))
 
-createCell :: forall m. String -> H.ParentHTML Query Cell.Query Slot m
-createCell orientationClass =
-  HH.slot CellSlot (Cell.cell orientationClass) unit (HE.input Clicked)
+createSlot :: forall m. (H.Component HH.HTML Cell.Query Cell.Input Cell.Message m)
+                     -> Int
+                     -> H.ParentHTML Query Cell.Query Slot m
+createSlot cell slotNumber = HH.slot (CellSlot slotNumber) cell unit (HE.input Clicked)
