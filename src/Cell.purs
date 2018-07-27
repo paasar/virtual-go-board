@@ -6,7 +6,6 @@ import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Generic.Rep.Eq (genericEq)
 
-import Data.Maybe (Maybe(..))
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -20,20 +19,19 @@ instance showCellState :: Show CellState where
 instance eqCellState :: Eq CellState where
   eq = genericEq
 
-nextState :: CellState -> CellState
-nextState Empty = Black
-nextState Black = White
-nextState White = Empty
+nextState :: CellState -> CellState -> CellState
+nextState _ Empty = Empty
+nextState s s' = if s == s' then Empty else s'
 
-type State = CellState
+type State = { current :: CellState
+             , desired :: CellState }
 
 data Query a
   = Toggle a
-  | Content (CellState -> a)
+  | HandleInput CellState a
 
-type Input = Unit
-
-data Message = Toggled CellState
+type Input = CellState
+data Message = Toggled State
 
 cell :: forall m. String -> H.Component HH.HTML Query Input Message m
 cell orientationClass =
@@ -41,37 +39,44 @@ cell orientationClass =
     { initialState: const initialState
     , render: (render orientationClass)
     , eval
-    , receiver: const Nothing
+    , receiver: HE.input HandleInput
     }
   where
 
   initialState :: State
-  initialState = Empty
+  initialState = { current: Empty
+                 , desired: Black }
 
   render :: String -> State -> H.ComponentHTML Query
   render orientationClassName state =
     let
-      children = if state == Empty
-                   then []
-                   else [ HH.div
-                          [ HP.classes [ (H.ClassName "piece"),
-                                         (H.ClassName $ show state)] ]
-                          [ HH.text ""]]
+      piece = if state.current == Empty
+                then [ ]
+                else [ HH.div
+                       [ HP.classes [ (H.ClassName "piece"),
+                                      (H.ClassName $ show state.current)] ]
+                       [ ]]
     in
       HH.div
         [ HP.classes [ (H.ClassName "cell"),
                        (H.ClassName orientationClassName) ]
-        , HE.onClick (HE.input_ Toggle) ]
-        children
+        , HE.onClick (HE.input_ Toggle)
+        ]
+        piece
 
   eval :: Query ~> H.ComponentDSL State Query Message m
   eval = case _ of
+    HandleInput desiredState next -> do
+      state <- H.get
+      H.put $ state { desired = desiredState }
+      pure next
+
     Toggle next -> do
       state <- H.get
-      let nxtState = nextState state
-      H.put nxtState
-      H.raise $ Toggled nxtState
+      let nxtState = nextState state.current state.desired
+      when (nxtState /= state.current) $ H.put $ state { current = nxtState }
+--    TODO raise not full state but only current
+      newState <- H.get
+      H.raise $ Toggled newState
       pure next
-    Content reply -> do
-      state <- H.get
-      pure (reply state)
+

@@ -12,9 +12,13 @@ import Halogen.HTML.Properties as HP
 import Cell as Cell
 
 data Query a
-  = Clicked Cell.Message a
+  = CellClicked Cell.Message a
+  | Switch a
 
-type State = Int
+data Mode = Static | Alternate
+
+type State = { action :: Cell.CellState
+             , mode :: Mode }
 
 data Slot = CellSlot Int
 derive instance eqCellSlot :: Eq Slot
@@ -30,25 +34,37 @@ board =
     }
   where
     initialState :: State
-    initialState = 0
+    initialState = { action: Cell.Black
+                   , mode: Static }
 
     render :: State -> H.ParentHTML Query Cell.Query Slot m
     render state =
-      HH.div
-        [ HP.classes [ (H.ClassName "board")
-                     , (H.ClassName $ "x" <> (show size)) ] ]
-        (createCells size)
-        where
-          -- TODO dropdown of 9, 13 and 19
-          size = 9
+      HH.div_
+      [
+        HH.button [ HE.onClick (HE.input_ Switch)]
+                  [ HH.text $ show state.action ]
+      , HH.div
+          [ HP.classes [ (H.ClassName "board")
+                       , (H.ClassName $ "x" <> (show size)) ] ]
+          (createCells state size)
+      ]
+      where
+        -- TODO dropdown of 9, 13 and 19
+        size = 9
 
     eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Void m
     eval = case _ of
-      Clicked (Cell.Toggled _) next -> do
+      CellClicked (Cell.Toggled _) next -> do
+        state <- H.get
+        H.put state { action = if state.action == Cell.Black then Cell.White else Cell.Black }
+        pure next
+      Switch next -> do
+        state <- H.get
+        H.put state { action = if state.action == Cell.Black then Cell.White else Cell.Black }
         pure next
 
-createCells :: forall m. Int -> Array (H.ParentHTML Query Cell.Query Slot m)
-createCells cellsPerRow = createSlots $ topRow <> middleRows <> bottomRow
+createCells :: forall m. State -> Int -> Array (H.ParentHTML Query Cell.Query Slot m)
+createCells state cellsPerRow = createSlots $ topRow <> middleRows <> bottomRow
   where
     topRow = [(Cell.cell "nw")]
           <> (replicate middleCellsAmount (Cell.cell "n"))
@@ -61,9 +77,14 @@ createCells cellsPerRow = createSlots $ topRow <> middleRows <> bottomRow
              <> (replicate middleCellsAmount (Cell.cell "s"))
              <> [(Cell.cell "se")]
     middleCellsAmount = (cellsPerRow - 2)
-    createSlots cells = zipWith createSlot cells (range 1 (length cells))
+    createSlots cells = zipWith (createSlot state) cells (range 1 (length cells))
 
-createSlot :: forall m. (H.Component HH.HTML Cell.Query Cell.Input Cell.Message m)
+createSlot :: forall m. State
+                     -> (H.Component HH.HTML Cell.Query Cell.Input Cell.Message m)
                      -> Int
                      -> H.ParentHTML Query Cell.Query Slot m
-createSlot cell slotNumber = HH.slot (CellSlot slotNumber) cell unit (HE.input Clicked)
+createSlot state cell slotNumber = HH.slot
+                               (CellSlot slotNumber)
+                               cell
+                               state.action
+                               (HE.input CellClicked)
