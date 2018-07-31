@@ -27,8 +27,8 @@ body {
 }
 
 .cell {
-  padding: 3px;
-  height: 40px;
+  padding: 4px;
+  height: 42px;
   background: #edecbd;
 }
 
@@ -63,7 +63,7 @@ body {
 .piece {
   background: #000;
   border-radius: 50%;
-  height: 40px;
+  height: 42px;
   box-shadow: 1px 1px 2px grey;
 }
 
