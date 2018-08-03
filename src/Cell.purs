@@ -31,7 +31,7 @@ data Query a
   | HandleInput CellState a
 
 type Input = CellState
-data Message = Toggled State
+data Message = Toggled CellState
 
 cell :: forall m. String -> H.Component HH.HTML Query Input Message m
 cell orientationClass =
@@ -68,15 +68,14 @@ cell orientationClass =
   eval = case _ of
     HandleInput desiredState next -> do
       state <- H.get
-      H.put $ state { desired = desiredState }
+      when (state.desired /= desiredState) $ H.modify_ (_ { desired = desiredState })
       pure next
 
     Toggle next -> do
       state <- H.get
       let nxtState = nextState state.current state.desired
-      when (nxtState /= state.current) $ H.put $ state { current = nxtState }
---    TODO raise not full state but only current
+      when (nxtState /= state.current) $ H.modify_ (_ { current = nxtState })
       newState <- H.get
-      H.raise $ Toggled newState
+      H.raise $ Toggled newState.current
       pure next
 

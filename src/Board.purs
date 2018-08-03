@@ -3,64 +3,62 @@ module Board where
 import Prelude
 
 import Data.Array (concat, length, range, replicate, zipWith)
-import Data.Maybe (Maybe(Nothing))
 
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+
 import Cell as Cell
+import ModeSelector as ModeSelector
+
+type Input = { action :: Cell.CellState
+             , mode :: ModeSelector.Mode}
 
 data Query a
   = CellClicked Cell.Message a
-  | Switch a
-
-data Mode = Static | Alternate
+  | HandleInput Input a
 
 type State = { action :: Cell.CellState
-             , mode :: Mode }
+             , mode :: ModeSelector.Mode }
 
 data Slot = CellSlot Int
 derive instance eqCellSlot :: Eq Slot
 derive instance ordCellSlot :: Ord Slot
 
-board :: forall m. H.Component HH.HTML Query Unit Void m
+type Message = Cell.Message
+
+board :: forall m. H.Component HH.HTML Query Input Message m
 board =
   H.parentComponent
     { initialState: const initialState
     , render
     , eval
-    , receiver: const Nothing
+    , receiver: HE.input HandleInput
     }
   where
     initialState :: State
     initialState = { action: Cell.Black
-                   , mode: Static }
+                   , mode: ModeSelector.Static }
 
     render :: State -> H.ParentHTML Query Cell.Query Slot m
     render state =
-      HH.div_
-      [
-        HH.button [ HE.onClick (HE.input_ Switch)]
-                  [ HH.text $ show state.action ]
-      , HH.div
-          [ HP.classes [ (H.ClassName "board")
-                       , (H.ClassName $ "x" <> (show size)) ] ]
-          (createCells state size)
-      ]
+      HH.div
+        [ HP.classes [ (H.ClassName "board")
+                     , (H.ClassName $ "x" <> (show size)) ] ]
+        (createCells state size)
       where
         -- TODO dropdown of 9, 13 and 19
         size = 9
 
-    eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Void m
+    eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Message m
     eval = case _ of
-      CellClicked (Cell.Toggled _) next -> do
-        state <- H.get
-        H.put state { action = if state.action == Cell.Black then Cell.White else Cell.Black }
+      CellClicked message next -> do
+        H.raise $ message
         pure next
-      Switch next -> do
+      HandleInput gameState next -> do
         state <- H.get
-        H.put state { action = if state.action == Cell.Black then Cell.White else Cell.Black }
+        when (gameState /= state) $ H.put $ gameState
         pure next
 
 createCells :: forall m. State -> Int -> Array (H.ParentHTML Query Cell.Query Slot m)
