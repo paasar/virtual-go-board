@@ -24,7 +24,7 @@ type State = { nextPiece :: Cell.CellState
              , mode :: Mode
              }
 
-data Query a = ModeChanged a
+data Query a = SetMode Mode Cell.CellState a
              | HandleInput Cell.CellState a
 
 type Input = Cell.CellState
@@ -43,30 +43,56 @@ modeSelector =
 
     initialState :: State
     initialState = { nextPiece: Cell.Black
-                   , mode: Static }
+                   , mode: Alternate }
 
     render :: State -> H.ComponentHTML Query
     render state =
       HH.div [ HP.classes [ (H.ClassName "mode-selector")
                           , (H.ClassName $ show state.nextPiece)
-                          , (H.ClassName $ show state.mode)]]
+                          , (H.ClassName $ show state.mode)]
+             ]
              [ HH.div [ HP.classes [ (H.ClassName "mode")
-                                   , (H.ClassName $ show Cell.Black) ]]
-                      [ HH.text "Black" ]
+                                   , (H.ClassName $ show Cell.Black) ]
+                      , HE.onClick (HE.input_ (SetMode Static Cell.Black)) ]
+                      [ HH.div [ HP.classes [ (H.ClassName "piece")
+                                            , (H.ClassName $ show Cell.Black)]]
+                               []]
              , HH.div [ HP.classes [ (H.ClassName "mode")
-                                   , (H.ClassName "Alternate") ]]
-                      [ HH.text "Alternate" ]
+                                   , (H.ClassName "Alternate") ]
+                      , HE.onClick (HE.input_ (SetMode Alternate state.nextPiece)) ]
+                      [ HH.div [ HP.classes [ (H.ClassName "piece")
+                                            , (H.ClassName $ show Cell.Black) ]]
+                               []
+                      , HH.div [ HP.classes [ (H.ClassName "piece")
+                                            , (H.ClassName $ show Cell.White) ]]
+                               []]
              , HH.div [ HP.classes [ (H.ClassName "mode")
-                                   , (H.ClassName $ show Cell.White) ]]
-                      [ HH.text "White" ]
+                                   , (H.ClassName $ show Cell.White) ]
+                      , HE.onClick (HE.input_ (SetMode Static Cell.White)) ]
+                      [ HH.div [ HP.classes [ (H.ClassName "piece")
+                                            , (H.ClassName $ show Cell.White)]]
+                               []]
              , HH.div [ HP.classes [ (H.ClassName "mode")
-                                   , (H.ClassName $ show Cell.Empty) ]]
-                      [ HH.text "Remove" ]]
+                                   , (H.ClassName $ show Cell.Empty) ]
+                      , HE.onClick (HE.input_ (SetMode Static Cell.Empty)) ]
+                      [ HH.div [ HP.class_ (H.ClassName "remove") ]
+                               [ HH.text "X" ]]
+             ]
     eval :: Query ~> H.ComponentDSL State Query Message m
     eval = case _ of
       HandleInput piece next -> do
         H.modify_ (\st -> st { nextPiece = piece })
         pure next
-      ModeChanged next -> do
-        -- TODO
+      SetMode newMode newNextPiece next -> do
+        state <- H.get
+        when (newMode /= state.mode) $ H.modify_ (_ {mode = newMode})
+        when (newNextPiece /= state.nextPiece) $ H.modify_ (_ {nextPiece = newNextPiece})
+        when (newMode == Alternate && state.mode == Alternate) $
+          H.modify_ (_ {nextPiece = if newNextPiece == Cell.Black
+                                      then Cell.White
+                                      else Cell.Black})
+        when (newMode == Alternate && newNextPiece == Cell.Empty) $
+          H.modify_ (_ {nextPiece = Cell.Black})
+        newState <- H.get
+        H.raise $ Changed newState
         pure next

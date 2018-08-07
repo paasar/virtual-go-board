@@ -14,22 +14,102 @@ body {
 
 .mode-selector {
   margin-left: 40px;
+  display: flex;
 }
 
 .mode-selector .mode {
+  margin-right: 5px;
+  padding: 4px;
+
+  box-sizing: border-box;
+  height: 54px;
+
+  border-radius: 2px;
+
+  color: #1e1616;
+  background-color: #edecbd;
+}
+
+.mode-selector .mode {
+  width: 54px;
+  font-size: 30px;
+  background-color: rgba(237, 236, 189, 0.7);
+}
+
+.mode-selector .piece {
   display: inline-block;
-  margin-right: 10px;
-  padding: 3px;
+  background-color: initial;
+  border: 2px solid black;
 }
 
-.mode-selector.Black .mode.Black {
-  color: #1e1616;
-  background-color: #edecbd;
+.mode-selector .piece.White {
+  border-color: white;
+  background-color: initial;
 }
 
-.mode-selector.White .mode.White {
+.mode-selector.Static.Black .piece.Black {
+  background-color: black;
+}
+
+.mode-selector.Static.White .piece.White {
+  background-color: white;
+}
+
+.mode-selector .mode.Alternate .piece {
+  height: 46px;
+  width: 23px;
+
+  background: none;
+  box-sizing: border-box;
+}
+
+.mode-selector .mode.Alternate .piece.Black {
+  border-top-left-radius: 92px;
+  border-bottom-left-radius: 92px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.mode-selector .mode.Alternate .piece.White {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 92px;
+  border-top-right-radius: 92px;
+
+  border-color: white;
+}
+
+.mode-selector.Static.Black .mode.Black,
+.mode-selector.Static.White .mode.White,
+.mode-selector.Static.Empty .mode.Empty,
+.mode-selector.Alternate .mode.Alternate {
+  background-color: rgba(237, 236, 189, 1);
+}
+
+ {
+  background-color: rgba(237, 236, 189, 1);
+}
+
+.mode-selector.Static .mode.Alternate .piece {
+  background-color: initial;
+}
+
+.mode-selector.Alternate.Black .mode.Alternate .piece.Black {
+  background-color: black;
+}
+
+.mode-selector.Alternate.White .mode.Alternate .piece.White {
+  background-color: white;
+}
+
+.mode-selector .remove {
+  text-align: center;
+  color: grey;
+  width: 42px;
+}
+
+.mode-selector.Static.Empty .remove {
   color: #1e1616;
-  background-color: #edecbd;
 }
 
 .board {
@@ -85,6 +165,7 @@ body {
   background: #000;
   border-radius: 50%;
   height: 42px;
+  width: 42px;
   box-shadow: 1px 1px 2px grey;
 }
 

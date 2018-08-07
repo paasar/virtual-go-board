@@ -1,6 +1,6 @@
 module Game where
 
-import Prelude (type (~>), (==), Unit, Void, bind, const, discard, pure, unit)
+import Prelude
 
 import Data.Either.Nested (Either2)
 import Data.Functor.Coproduct.Nested (Coproduct2)
@@ -25,6 +25,15 @@ type State = { action :: Cell.CellState
 
 type Slot = Either2 Unit Unit
 
+
+nextAction :: State -> Cell.CellState -> Cell.CellState
+nextAction {action, mode} cellState =
+  case mode of
+    ModeSelector.Static -> action
+    _ -> if action == Cell.Black
+           then Cell.White
+           else Cell.Black
+
 game :: forall m. H.Component HH.HTML Query Unit Void m
 game =
   H.parentComponent
@@ -36,7 +45,7 @@ game =
   where
     initialState :: State
     initialState = { action: Cell.Black
-                   , mode: ModeSelector.Static }
+                   , mode: ModeSelector.Alternate }
 
     render :: State -> H.ParentHTML Query ChildQuery Slot m
     render state =
@@ -50,12 +59,12 @@ game =
 
     eval :: Query ~> H.ParentDSL State Query ChildQuery Slot Void m
     eval = case _ of
-      ModeChanged (ModeSelector.Changed _) next -> do
-        -- TODO set to state
+      ModeChanged (ModeSelector.Changed modeState) next -> do
+        -- TODO when
+        H.put $ { action: modeState.nextPiece, mode: modeState.mode}
         pure next
-      CellClicked (Cell.Toggled _) next -> do
+      CellClicked (Cell.Toggled cellState) next -> do
         state <- H.get
-        H.modify_ (_ { action = if state.action == Cell.Black
-                                   then Cell.White
-                                   else Cell.Black } )
+        -- TODO when
+        H.modify_ (_ {action = nextAction state cellState})
         pure next
