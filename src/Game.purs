@@ -36,8 +36,8 @@ nextAction {action, mode} cellState =
            then Cell.White
            else Cell.Black
 
-game :: forall m. H.Component HH.HTML Query Unit Void m
-game =
+game :: forall m. Int -> H.Component HH.HTML Query Unit Void m
+game size =
   H.parentComponent
     { initialState: const initialState
     , render
@@ -59,7 +59,7 @@ game =
                          (HE.input ModeChanged)
                 , HH.slot' CP.cp2 unit CaptureZones.captureZones unit absurd
                 ]
-              , HH.slot' CP.cp3 unit Board.board state (HE.input CellClicked)
+              , HH.slot' CP.cp3 unit (Board.board size) state (HE.input CellClicked)
               ]
 
     eval :: Query ~> H.ParentDSL State Query ChildQuery Slot Void m

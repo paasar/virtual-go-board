@@ -14,7 +14,21 @@ body {
 #title {
   font-size: 20px;
   margin-left: 40px;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  display: inline-block;
+}
+
+#sizes {
+  display: inline-block;
+  margin-left: 40px;
+}
+
+#sizes a {
+  margin-right: 5px;
+}
+
+a {
+  color: var(--light);
 }
 
 .modes-and-captures {

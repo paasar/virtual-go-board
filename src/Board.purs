@@ -28,8 +28,8 @@ derive instance ordCellSlot :: Ord Slot
 
 type Message = Cell.Message
 
-board :: forall m. H.Component HH.HTML Query Input Message m
-board =
+board :: forall m. Int -> H.Component HH.HTML Query Input Message m
+board size =
   H.parentComponent
     { initialState: const initialState
     , render
@@ -47,9 +47,6 @@ board =
         [ HP.classes [ (H.ClassName "board")
                      , (H.ClassName $ "x" <> (show size)) ] ]
         (createCells state size)
-      where
-        -- TODO dropdown of 9, 13 and 19
-        size = 9
 
     eval :: Query ~> H.ParentDSL State Query Cell.Query Slot Message m
     eval = case _ of
