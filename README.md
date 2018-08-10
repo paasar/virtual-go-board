@@ -27,3 +27,11 @@ Then open `static/index.html` in your favorite browser.
 
 After build copy everything under `static` to the server.
 
+## Ideas for further developement
+
+   * Load/save state from/to a file
+   * Tree of the game played
+   * Multiplayer through network
+   * AI opponent in a server
+   * AI suggestions for moves
+   * An interactive guide that teaches the rules
