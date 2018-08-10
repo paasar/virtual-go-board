@@ -1,8 +1,13 @@
+:root {
+  --light: #edecbd;
+  --dark: #1e1616;
+}
+
 body {
-  color: #edecbd;
+  color: var(--light);
   font-family: 'Kaushan Script', cursive, sans-serif;
 
-  background-color: #1e1616;
+  background-color: var(--dark);
   background-image: url("data:image/svg+xml,%3Csvg width='32' height='64' viewBox='0 0 32 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 28h20V16h-4v8H4V4h28v28h-4V8H8v12h4v-8h12v20H0v-4zm12 8h20v4H16v24H0v-4h12V36zm16 12h-4v12h8v4H20V44h12v12h-4v-8zM0 36h8v20H0v-4h4V40H0v-4z' fill='%23332626' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
 }
 
@@ -10,6 +15,10 @@ body {
   font-size: 20px;
   margin-left: 40px;
   margin-bottom: 20px;
+}
+
+.modes-and-captures {
+  display: flex;
 }
 
 .mode-selector {
@@ -26,8 +35,8 @@ body {
 
   border-radius: 2px;
 
-  color: #1e1616;
-  background-color: #edecbd;
+  color: var(--dark);
+  background-color: var(--light);
 }
 
 .mode-selector .mode {
@@ -109,7 +118,41 @@ body {
 }
 
 .mode-selector.Static.Empty .remove {
-  color: #1e1616;
+  color: var(--dark);
+}
+
+.capture-zones {
+  display: flex;
+  margin-left: 40px;
+}
+
+.capture-zone {
+  display: flex;
+  background: var(--light);
+  height: 54px;
+  padding: 5px;
+  box-sizing: border-box;
+  margin-right: 5px;
+  border-radius: 3px;
+}
+
+.capture-cell.White {
+  color: var(--dark);
+}
+
+.capture-cell .piece {
+  text-align: center;
+  line-height: 42px;
+  margin-left: 3px;
+}
+
+.capture-zone .free-cell {
+  width: 54px;
+  height: 54px;
+  color: grey;
+  font-size: 20px;
+  text-align: center;
+  padding: 4px;
 }
 
 .board {
@@ -130,7 +173,7 @@ body {
 .cell {
   padding: 4px;
   height: 42px;
-  background: #edecbd;
+  background: var(--light);
 }
 
 .cell.nw {

@@ -2,28 +2,30 @@ module Game where
 
 import Prelude
 
-import Data.Either.Nested (Either2)
-import Data.Functor.Coproduct.Nested (Coproduct2)
+import Data.Either.Nested (Either3)
+import Data.Functor.Coproduct.Nested (Coproduct3)
 import Data.Maybe (Maybe(Nothing))
 
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
 import Halogen.Component.ChildPath as CP
 
 import Board as Board
+import CaptureZones as CaptureZones
 import Cell as Cell
 import ModeSelector as ModeSelector
 
 data Query a = ModeChanged ModeSelector.Message a
              | CellClicked Board.Message a
 
-type ChildQuery = Coproduct2 ModeSelector.Query Board.Query
+type ChildQuery = Coproduct3 ModeSelector.Query CaptureZones.Query Board.Query
 
 type State = { action :: Cell.CellState
              , mode :: ModeSelector.Mode }
 
-type Slot = Either2 Unit Unit
+type Slot = Either3 Unit Unit Unit
 
 
 nextAction :: State -> Cell.CellState -> Cell.CellState
@@ -49,12 +51,15 @@ game =
 
     render :: State -> H.ParentHTML Query ChildQuery Slot m
     render state =
-      HH.div_ [ HH.slot' CP.cp1
+      HH.div_ [ HH.div [ HP.class_ (H.ClassName "modes-and-captures")]
+                [ HH.slot' CP.cp1
                          unit
                          ModeSelector.modeSelector
                          state.action
                          (HE.input ModeChanged)
-              , HH.slot' CP.cp2 unit Board.board state (HE.input CellClicked)
+                , HH.slot' CP.cp2 unit CaptureZones.captureZones unit absurd
+                ]
+              , HH.slot' CP.cp3 unit Board.board state (HE.input CellClicked)
               ]
 
     eval :: Query ~> H.ParentDSL State Query ChildQuery Slot Void m
