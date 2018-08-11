@@ -109,10 +109,6 @@ a {
   background-color: rgba(237, 236, 189, 1);
 }
 
- {
-  background-color: rgba(237, 236, 189, 1);
-}
-
 .mode-selector.Static .mode.Alternate .piece {
   background-color: initial;
 }
@@ -138,6 +134,10 @@ a {
 .capture-zones {
   display: flex;
   margin-left: 40px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
 .capture-zone {
