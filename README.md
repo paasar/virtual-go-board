@@ -2,6 +2,8 @@
 
 A virtual Go board you can use to play the game, test your thoughts with or teach an another player.
 
+![Screenshot](./virtual-go-board.png)
+
 Developed with PureScript.
 
 ## Requirements
