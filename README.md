@@ -2,6 +2,8 @@
 
 A virtual Go board you can use to play the game, test your thoughts with or teach an another player.
 
+You can try it here: https://paasar.github.io/virtual-go-board/
+
 ![Screenshot](./virtual-go-board.png)
 
 Developed with PureScript.
